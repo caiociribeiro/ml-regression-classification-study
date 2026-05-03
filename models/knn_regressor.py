@@ -1,0 +1,42 @@
+import numpy as np
+
+
+class KNNRegressor:
+    def __init__(self, k=5, metric="euclidean"):
+        self.k = k
+        self.metric = metric
+
+    def fit(self, X_train, y_train):
+        self.X_train = np.array(X_train, dtype=float)
+        self.y_train = np.array(y_train, dtype=float)
+
+    def _euclidean_distance(self, x1, x2):
+        return np.sqrt(np.sum((x1 - x2) ** 2))
+
+    def _manhattan_distance(self, x1, x2):
+        return np.sum(np.abs(x1 - x2))
+
+    def get_distance(self, x1, x2):
+        if self.metric == "euclidean":
+            return self._euclidean_distance(x1, x2)
+        return self._manhattan_distance(x1, x2)
+
+    def _predict_single(self, x):
+        distances = [self.get_distance(x, x_train) for x_train in self.X_train]
+        k_indices = np.argsort(distances)[:self.k]
+        k_values = self.y_train[k_indices]
+        return np.mean(k_values)
+
+    def predict(self, X_test):
+        X_test = np.array(X_test, dtype=float)
+
+        predictions = []
+        total = len(X_test)
+
+        for i, x in enumerate(X_test):
+            if i % 500 == 0:
+                print(f"Predizendo amostra {i}/{total}")
+
+            predictions.append(self._predict_single(x))
+
+        return np.array(predictions)

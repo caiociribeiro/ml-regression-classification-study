@@ -1,0 +1,18 @@
+DATASET_REGRESSION_ID = 43371
+DATASET_CLASSIFICATION_ID = 46255
+
+REGRESSION_TARGET_NAME = "daily_new_cases"
+CLASSIFICATION_TARGET_NAME = "GradeClass"
+
+N_FOLDS = 5
+RANDOM_SEED = 42
+
+K_VALUES = [5]
+DISTANCE_METRICS = ["euclidean", "manhattan"]
+
+SAVE_PLOTS = True
+PLOTS_DIR = "outputs/figures"
+
+SAVE_RESULTS = True
+RESULTS_DIR = "outputs/tables"
+
