@@ -12,10 +12,14 @@ def main():
 
     arg = sys.argv[1]
 
+    use_kdtree = False
+    if "use-kdtree" in sys.argv[2:]:
+        use_kdtree = True
+
     if arg in ["r", "regression"]:
-        run_regression()
+        run_regression(use_kdtree=use_kdtree)
     elif arg in ["c", "classification"]:
-        run_classification()
+        run_classification(use_kdtree=use_kdtree)
     else:
         print("Argumento inválido")
 

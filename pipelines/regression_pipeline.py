@@ -109,7 +109,7 @@ def print_summary(results):
         )
 
 
-def run_regression():
+def run_regression(use_kdtree=False):
     print("\n===== REGRESSÃO =====")
 
     X, y, feature_names = load_dataset(
@@ -135,7 +135,7 @@ def run_regression():
     results.append(
         run_model(
             "KNN (Euclidiana)",
-            lambda: KNNRegressor(k=K_VALUES[0], metric="euclidean"),
+            lambda: KNNRegressor(k=K_VALUES[0], metric="euclidean", use_kdtree=use_kdtree),
             X,
             y
         )
@@ -144,7 +144,7 @@ def run_regression():
     results.append(
         run_model(
             "KNN (Manhattan)",
-            lambda: KNNRegressor(k=K_VALUES[0], metric="manhattan"),
+            lambda: KNNRegressor(k=K_VALUES[0], metric="manhattan", use_kdtree=use_kdtree),
             X,
             y
         )

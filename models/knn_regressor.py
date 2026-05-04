@@ -1,14 +1,21 @@
 import numpy as np
+from .kd_tree import KDTree
 
 
 class KNNRegressor:
-    def __init__(self, k=5, metric="euclidean"):
+    def __init__(self, k=5, metric="euclidean", use_kdtree=True):
         self.k = k
         self.metric = metric
+        self.use_kdtree = use_kdtree
+        self.tree = None
 
     def fit(self, X_train, y_train):
         self.X_train = np.array(X_train, dtype=float)
         self.y_train = np.array(y_train, dtype=float)
+
+        if self.use_kdtree:
+            self.tree = KDTree(self.X_train)
+            print("Usando KD-tree")
 
     def _euclidean_distance(self, x1, x2):
         return np.sqrt(np.sum((x1 - x2) ** 2))
@@ -33,10 +40,26 @@ class KNNRegressor:
         predictions = []
         total = len(X_test)
 
-        for i, x in enumerate(X_test):
-            if i % 500 == 0:
-                print(f"Predizendo amostra {i}/{total}")
+        if self.use_kdtree and self.tree is not None:
+            p = 2 if self.metric == "euclidean" else 1
+            k_eff = min(self.k, len(self.X_train))
+            dists, idxs = self.tree.query(X_test, k=k_eff, p=p)
+            if k_eff == 1:
+                idxs = idxs.reshape(-1, 1)
 
-            predictions.append(self._predict_single(x))
+            for i, neighbors in enumerate(idxs):
+                if i % 500 == 0:
+                    print(f"Predizendo amostra {i+1}/{total}")
+
+                k_values = self.y_train[neighbors]
+                predictions.append(np.mean(k_values))
+        else:
+            for i, x in enumerate(X_test):
+                if i % 500 == 0:
+                    print(f"Predizendo amostra {i+1}/{total}")
+
+                predictions.append(self._predict_single(x))
+
+        print(f"Predição completa ({total} amostras)")
 
         return np.array(predictions)

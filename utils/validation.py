@@ -1,13 +1,13 @@
 import numpy as np
 import time
 
+
 def k_fold_split(X, y, n_folds=5, random_state=42):
     X = np.array(X)
     y = np.array(y)
 
-    indices = np.arange(len(X))
-    np.random.seed(random_state)
-    np.random.shuffle(indices)
+    rng = np.random.default_rng(random_state)
+    indices = rng.permutation(len(X))
 
     fold_sizes = np.full(n_folds, len(X) // n_folds)
     fold_sizes[:len(X) % n_folds] += 1
@@ -39,12 +39,7 @@ def cross_validation(model, X, y, metrics_fn, n_folds=5, random_state=42, **kwar
     train_times = []
     test_times = []
 
-    for i, (train_idx, test_idx) in enumerate(folds):
-        X_train = X[train_idx]
-        X_test = X[test_idx]
-        y_train = y[train_idx]
-        y_test = y[test_idx]
-
+    for i, (X_train, X_test, y_train, y_test) in enumerate(folds):
         start = time.time()
         model.fit(X_train, y_train)
         train_times.append(time.time() - start)

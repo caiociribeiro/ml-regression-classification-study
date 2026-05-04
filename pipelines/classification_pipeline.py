@@ -104,7 +104,7 @@ def print_summary(results):
             f"{f'{r['test_time_mean']:.4f} ± {r['test_time_std']:.4f}':<{col_time}}"
         )
 
-def run_classification():
+def run_classification(use_kdtree=False):
     print("\n===== CLASSIFICAÇÃO =====")
 
     X, y, _ = load_dataset(
@@ -117,7 +117,7 @@ def run_classification():
     results.append(
         run_model(
             "KNN (Euclidiana)",
-            KNNClassifier(k=K_VALUES[0], metric="euclidean"),
+            KNNClassifier(k=K_VALUES[0], metric="euclidean", use_kdtree=use_kdtree),
             X,
             y
         )
@@ -126,7 +126,7 @@ def run_classification():
     results.append(
         run_model(
             "KNN (Manhattan)",
-            KNNClassifier(k=K_VALUES[0], metric="manhattan"),
+            KNNClassifier(k=K_VALUES[0], metric="manhattan", use_kdtree=use_kdtree),
             X,
             y
         )
