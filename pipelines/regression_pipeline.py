@@ -18,16 +18,21 @@ from models.knn_regressor import KNNRegressor
 from models.linear_regression import LinearRegression
 
 
+# media e desvio
 def summarize(values):
     values = np.array(values, dtype=float)
     return np.mean(values), np.std(values)
 
 
+# executa um modelo em todos os folds e retorna resumo
+# model_factory: função que cria instancia do modelo
 def run_model(model_name, model_factory, X, y):
-    print(f"\n===== Executando: {model_name} =====")
+    print(f"\nExecutando: {model_name}")
 
+    # obtem folds com k-fold
     folds = k_fold_split(X, y, n_folds=N_FOLDS, random_state=RANDOM_SEED)
 
+    # resultados por metrica
     metric_results = {
         "mse": [],
         "rmse": [],
@@ -39,6 +44,7 @@ def run_model(model_name, model_factory, X, y):
     train_times = []
     test_times = []
 
+    # para cada fold: preprocessa, treina, prediz e calcula metricas
     for i, (X_train, X_test, y_train, y_test) in enumerate(folds):
         print(f"\n[{model_name}] Fold {i+1}/{len(folds)}")
 
@@ -62,12 +68,14 @@ def run_model(model_name, model_factory, X, y):
             n_features=X_train.shape[1]
         )
 
+        # armazena metricas
         for key in metric_results:
             metric_results[key].append(metrics[key])
 
         train_times.append(end_train - start_train)
         test_times.append(end_test - start_test)
 
+    # cria dict resumo com medias e desvios das metricas/tempos
     summary = {
         "model": model_name,
         "r2_mean": summarize(metric_results["r2"])[0],
@@ -82,8 +90,10 @@ def run_model(model_name, model_factory, X, y):
 
     return summary
 
+
+# imprime tabela resultados
 def print_summary(results):
-    print("\n===== RESULTADOS =====\n")
+    print("\nRESULTADOS\n")
 
     col_model = 25
     col_metric = 20
@@ -109,29 +119,36 @@ def print_summary(results):
         )
 
 
+# prepara dados e executa modelos de regressao
+# retorna resumo dos resultados
 def run_regression(use_kdtree=False):
     print("\n===== REGRESSÃO =====")
 
+    # carrega dataset
     X, y, feature_names = load_dataset(
         DATASET_REGRESSION_ID,
         target_name=REGRESSION_TARGET_NAME
     )
 
+    # colunas a remover quando presentes
     columns_to_remove = [
         REGRESSION_TARGET_NAME,
         "running_total_cases",
         "running_total_cases_prev_day"
     ]
 
+    # identifica indices das colunas a remover
     indices_to_remove = [
         i for i, name in enumerate(feature_names)
         if name in columns_to_remove
     ]
 
+    # remove colunas indesejadas
     X = np.delete(X, indices_to_remove, axis=1)
 
     results = []
 
+    # executa KNN euclidiana
     results.append(
         run_model(
             "KNN (Euclidiana)",
@@ -141,6 +158,7 @@ def run_regression(use_kdtree=False):
         )
     )
 
+    # executa KNN manhattan
     results.append(
         run_model(
             "KNN (Manhattan)",
@@ -150,6 +168,7 @@ def run_regression(use_kdtree=False):
         )
     )
 
+    # executa regressao multipla
     results.append(
         run_model(
             "Regressão Linear",
@@ -159,4 +178,5 @@ def run_regression(use_kdtree=False):
         )
     )
 
+    # imprime resumo final
     print_summary(results)

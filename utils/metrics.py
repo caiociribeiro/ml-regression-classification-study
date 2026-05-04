@@ -1,17 +1,19 @@
 import numpy as np
 
-
 def mse(y_true, y_pred):
+    # converte para float e calcula mean squared error
     y_true = np.array(y_true, dtype=float)
     y_pred = np.array(y_pred, dtype=float)
     return np.mean((y_true - y_pred) ** 2)
 
 
 def rmse(y_true, y_pred):
+    # raiz do MSE
     return np.sqrt(mse(y_true, y_pred))
 
 
 def mae(y_true, y_pred):
+    # mean absolute error
     y_true = np.array(y_true, dtype=float)
     y_pred = np.array(y_pred, dtype=float)
     return np.mean(np.abs(y_true - y_pred))
@@ -38,6 +40,7 @@ def r2_adjusted(y_true, y_pred, n_features):
 
 
 def regression_metrics(y_true, y_pred, n_features):
+    # retorna dict com metricas de regressao
     return {
         "mse": mse(y_true, y_pred),
         "rmse": rmse(y_true, y_pred),
@@ -48,6 +51,7 @@ def regression_metrics(y_true, y_pred, n_features):
 
 
 def classification_metrics(y_true, y_pred):
+    # calcula accuracy, precision, recall e f1
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
 
@@ -62,6 +66,7 @@ def classification_metrics(y_true, y_pred):
         fp = np.sum((y_true != c) & (y_pred == c))
         fn = np.sum((y_true == c) & (y_pred != c))
 
+        # evita divisao por zero adicionando valor muito pequeno ao denominador
         precisions.append(tp / (tp + fp + 1e-9))
         recalls.append(tp / (tp + fn + 1e-9))
 

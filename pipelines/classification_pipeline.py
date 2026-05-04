@@ -19,16 +19,20 @@ from models.naive_bayes import NaiveBayes
 from models.bayesian_multivariate import BayesianMultivariate
 
 
+# calcula media e desvio
 def summarize(values):
     values = np.array(values, dtype=float)
     return np.mean(values), np.std(values)
 
 
+# executa um modelo em todos os folds e retorna resumo
 def run_model(model_name, model, X, y):
-    print(f"\n===== Executando: {model_name} =====")
+    print(f"\nExecutando: {model_name}")
 
+    # obtem folds com k-fold
     folds = k_fold_split(X, y, n_folds=N_FOLDS, random_state=RANDOM_SEED)
 
+    # resultados por metrica
     metric_results = {
         "accuracy": [],
         "precision": [],
@@ -39,6 +43,7 @@ def run_model(model_name, model, X, y):
     train_times = []
     test_times = []
 
+    # para cada fold: preprocessa, treina, testa e coleta metricas
     for i, (X_train, X_test, y_train, y_test) in enumerate(folds):
         print(f"\n[{model_name}] Fold {i+1}/{len(folds)}")
 
@@ -46,12 +51,10 @@ def run_model(model_name, model, X, y):
         X_train = pre.fit_transform(X_train)
         X_test = pre.transform(X_test)
 
-        # TREINO
         start_train = time.time()
         model.fit(X_train, y_train)
         end_train = time.time()
 
-        # TESTE
         start_test = time.time()
         y_pred = model.predict(X_test)
         end_test = time.time()
@@ -66,6 +69,7 @@ def run_model(model_name, model, X, y):
         train_times.append(end_train - start_train)
         test_times.append(end_test - start_test)
 
+    # retorna resumo com medias e desvios para accuracy, f1 e tempos
     return {
         "model": model_name,
         "acc_mean": summarize(metric_results["accuracy"])[0],
@@ -78,8 +82,10 @@ def run_model(model_name, model, X, y):
         "test_time_std": summarize(test_times)[1],
     }
 
+
+# imprime tabela resultados
 def print_summary(results):
-    print("\n===== RESULTADOS =====\n")
+    print("\nRESULTADOS\n")
 
     col_model = 25
     col_metric = 20
@@ -104,9 +110,11 @@ def print_summary(results):
             f"{f'{r['test_time_mean']:.4f} ± {r['test_time_std']:.4f}':<{col_time}}"
         )
 
+
 def run_classification(use_kdtree=False):
     print("\n===== CLASSIFICAÇÃO =====")
 
+    # carrega dataset de classificacao
     X, y, _ = load_dataset(
         DATASET_CLASSIFICATION_ID,
         target_name=CLASSIFICATION_TARGET_NAME
@@ -114,6 +122,7 @@ def run_classification(use_kdtree=False):
 
     results = []
 
+    # executa KNN euclidiana
     results.append(
         run_model(
             "KNN (Euclidiana)",
@@ -123,6 +132,7 @@ def run_classification(use_kdtree=False):
         )
     )
 
+    # executa KNN manhattan
     results.append(
         run_model(
             "KNN (Manhattan)",
@@ -132,7 +142,9 @@ def run_classification(use_kdtree=False):
         )
     )
 
+    # executa naive bayes e bayes multi
     results.append(run_model("Naive Bayes", NaiveBayes(), X, y))
     results.append(run_model("Bayes Multivariado", BayesianMultivariate(), X, y))
 
+    # imprime resumo final
     print_summary(results)

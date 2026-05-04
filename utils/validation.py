@@ -6,15 +6,18 @@ def k_fold_split(X, y, n_folds=5, random_state=42):
     X = np.array(X)
     y = np.array(y)
 
+    # RNG e embaralhamento de indices
     rng = np.random.default_rng(random_state)
     indices = rng.permutation(len(X))
 
+    # calcula o tamanho de cada fold
     fold_sizes = np.full(n_folds, len(X) // n_folds)
     fold_sizes[:len(X) % n_folds] += 1
 
     folds = []
     start = 0
 
+    # cria pares train/test para cada fold
     for fold_size in fold_sizes:
         end = start + fold_size
 
@@ -29,16 +32,19 @@ def k_fold_split(X, y, n_folds=5, random_state=42):
         folds.append((X_train, X_test, y_train, y_test))
         start = end
 
+    # retorna lista de tuplas (X_train, X_test, y_train, y_test)
     return folds
 
 
 def cross_validation(model, X, y, metrics_fn, n_folds=5, random_state=42, **kwargs):
+    # obtem os folds
     folds = k_fold_split(X, y, n_folds, random_state)
 
     metrics_list = []
     train_times = []
     test_times = []
 
+    # para cada fold: treina, prediz e calcula metricas
     for i, (X_train, X_test, y_train, y_test) in enumerate(folds):
         start = time.time()
         model.fit(X_train, y_train)
@@ -51,4 +57,5 @@ def cross_validation(model, X, y, metrics_fn, n_folds=5, random_state=42, **kwar
         metrics = metrics_fn(y_test, y_pred, **kwargs)
         metrics_list.append(metrics)
 
+    # retorna metricas e tempos de treino/teste por fold
     return metrics_list, train_times, test_times

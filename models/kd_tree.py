@@ -78,7 +78,7 @@ class KDTree:
         idxs = np.zeros((n, k_eff), dtype=int)
 
         for i, x in enumerate(X):
-            heap = []  # max-heap via negated distances
+            heap = [] 
             self._query_single(self.root, x, k_eff, heap, p)
 
             heap_sorted = sorted([(-d, idx) for (d, idx) in heap])

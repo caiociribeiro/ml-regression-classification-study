@@ -21,7 +21,7 @@ def main():
     elif arg in ["c", "classification"]:
         run_classification(use_kdtree=use_kdtree)
     else:
-        print("Argumento inválido")
+        print("Argumento invalido")
 
 
 if __name__ == "__main__":

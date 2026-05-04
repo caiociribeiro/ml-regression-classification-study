@@ -10,6 +10,3 @@ RANDOM_SEED = 42
 K_VALUES = [5]
 DISTANCE_METRICS = ["euclidean", "manhattan"]
 
-SAVE_RESULTS = True
-RESULTS_DIR = "outputs/tables"
-

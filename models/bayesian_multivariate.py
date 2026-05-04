@@ -2,6 +2,7 @@ import numpy as np
 
 class BayesianMultivariate:
     def fit(self, X_train, y_train):
+        # obtem classes e calcula parametros (media, covariancia, prior) por classe
         self._classes = np.unique(y_train)
         self.params = []
 
@@ -15,8 +16,10 @@ class BayesianMultivariate:
             })
 
     def _pdf(self, x, mean, cov):
+        # calcula densidade da normal multivariada para amostra x
         d = len(mean)
 
+        # regulariza covariancia para evitar singularidade
         cov = cov + np.eye(d) * 1e-6
 
         det = np.linalg.det(cov)
@@ -30,9 +33,11 @@ class BayesianMultivariate:
         return (exponent / (denom + 1e-9)).item()
 
     def predict(self, X_test):
+        # prediz para cada amostra de X_test
         return np.array([self._predict_single(x) for x in X_test])
 
     def _predict_single(self, x):
+        # calcula posterior para cada classe e escolhe a maior
         posteriors = []
 
         for p in self.params:
