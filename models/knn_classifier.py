@@ -1,7 +1,6 @@
 import numpy as np
 
 
-# knn classifier com opcao de usar kd-tree
 class KNNClassifier:
     def __init__(self, k=5, metric="euclidean"):
         # numero de vizinhos, metrica de distancia e flag para uso de kd-tree
